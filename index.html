@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engajamento Commit</title>
+<link rel="icon" href="logo.png">
+<style>
+:root{
+  --bg:#07090f;--p:#0e121c;--p2:#131927;--bd:#1f2738;--tx:#e9edf5;--mut:#7f8aa3;
+  --like:#5b8cff;--like2:#8ab0ff;--com:#ffb020;--com2:#ffd37a;--ok:#2ee59d;--bad:#ff5d73;--acc:#a78bfa;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font:13px/1.4 "Inter",system-ui,sans-serif;overflow:hidden;
+  background-image:radial-gradient(900px 500px at 10% -10%,#5b8cff22,transparent 60%),radial-gradient(800px 500px at 100% 0%,#a78bfa1c,transparent 60%)}
+.app{height:100vh;display:grid;grid-template-rows:auto auto 1fr;gap:12px;padding:14px 16px;max-width:1700px;margin:0 auto}
+/* header */
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{height:40px;width:auto;filter:drop-shadow(0 4px 14px #1e82dc66);animation:pop .7s both}
+h1{font-size:17px;letter-spacing:-.2px}
+.sub{color:var(--mut);font-size:11.5px}
+.sp{flex:1}
+.ctl{display:flex;align-items:center;gap:6px;background:var(--p);border:1px solid var(--bd);border-radius:10px;padding:5px 9px}
+.ctl span{color:var(--mut);font-size:11px}
+select,input{background:transparent;color:var(--tx);border:0;outline:0;font:inherit;max-width:230px}
+select option{background:var(--p);color:var(--tx)}
+input[type=number]{width:38px;text-align:center}
+.ctl:focus-within{border-color:var(--like);box-shadow:0 0 0 3px #5b8cff22}
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.kpi{background:var(--p);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;position:relative;overflow:hidden;animation:rise .6s both}
+.kpi::after{content:"";position:absolute;inset:auto -20% -60% auto;width:90px;height:90px;border-radius:50%;background:var(--c,var(--like));opacity:.12;filter:blur(8px)}
+.kpi b{font-size:24px;letter-spacing:-.5px;display:block;line-height:1.15;font-variant-numeric:tabular-nums}
+.kpi small{color:var(--mut);font-size:11px}
+/* panels */
+.main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:12px;min-height:0}
+.lcol,.rcol{display:grid;gap:12px;min-height:0}
+.lcol{grid-template-rows:minmax(0,.9fr) minmax(0,1fr)}
+.rcol{grid-template-rows:auto minmax(0,1fr)}
+.chartbox{flex:1;min-height:0;position:relative;padding:0 10px 8px}
+.chartscroll{width:100%;height:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+.chartbox svg{height:100%;display:block}
+.ar{opacity:0;animation:fade .9s 1.1s forwards}
+.cp{opacity:0;animation:pop .4s forwards;cursor:pointer}
+.gl{stroke:var(--bd);stroke-width:1}
+.vl{fill:var(--tx);font-size:12px;font-weight:700}
+.tr{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1s .5s forwards}
+.trendtx{position:absolute;left:46px;top:2px;font-size:11.5px}
+.ax{fill:var(--mut);font-size:10.5px}
+.tip{position:absolute;pointer-events:none;background:var(--p2);border:1px solid var(--bd);border-radius:9px;padding:7px 10px;font-size:11.5px;box-shadow:0 8px 28px #0008;opacity:0;transform:translateY(4px);transition:.15s;z-index:5;white-space:nowrap}
+.tip b{display:block;margin-bottom:3px}
+.lg{cursor:pointer;user-select:none;display:inline-flex;align-items:center}
+.lg{padding:2px 8px;border-radius:99px;border:1px solid transparent}
+.lg:hover{border-color:var(--bd)}
+.lg:not(.off){background:var(--p2);border-color:var(--bd);color:var(--tx)}
+.lg.off{opacity:.6}
+.hint{position:absolute;left:0;right:0;bottom:30px;text-align:center;color:var(--mut);font-size:11px}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fade{to{opacity:1}}
+.panel{background:var(--p);border:1px solid var(--bd);border-radius:14px;display:flex;flex-direction:column;min-height:0;overflow:hidden;animation:rise .7s both}
+.panel:nth-child(2){animation-delay:.08s}.panel:nth-child(3){animation-delay:.16s}
+.ph{display:flex;align-items:center;gap:10px;padding:11px 14px 8px}
+.ph h2{font-size:12.5px;font-weight:650;letter-spacing:.2px;text-transform:uppercase;color:var(--mut)}
+.leg{margin-left:auto;display:flex;gap:10px;color:var(--mut);font-size:11px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:4px}
+.scroll{overflow:auto;flex:1;padding:2px 14px 12px;min-height:0;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+/* podium */
+.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 8px}
+.pod{background:var(--p2);border:1px solid var(--bd);border-radius:11px;padding:8px 10px;position:relative;animation:pop .6s both}
+.pod:nth-child(1){animation-delay:.15s;border-color:#ffb02066;box-shadow:0 0 24px #ffb02018}
+.pod:nth-child(2){animation-delay:.25s}.pod:nth-child(3){animation-delay:.35s}
+.pod .m{font-size:11px;font-weight:800;color:var(--com);letter-spacing:.5px}.pod:nth-child(2) .m{color:#c0c8d8}.pod:nth-child(3) .m{color:#d98a5a}.pod .nm{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+.pod .pt{color:var(--mut);font-size:11px}
+/* rank rows */
+.rk{display:grid;grid-template-columns:20px 26px minmax(0,1fr) 34px;gap:8px;align-items:center;padding:4px 0;opacity:0;animation:slide .5s forwards;border-radius:8px}
+.rk:hover{background:var(--p2)}
+.rk .i{color:var(--mut);font-size:11px;text-align:right;font-variant-numeric:tabular-nums}
+.av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:10.5px;font-weight:700;color:#fff}
+.rk .t{min-width:0}.rk .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px;line-height:1.1}
+.bar{height:7px;border-radius:4px;background:var(--p2);display:flex;overflow:hidden;margin-top:3px}
+.bar i{height:100%;width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.bar i:first-child{background:linear-gradient(90deg,var(--like),var(--like2))}
+.bar i:last-child{background:linear-gradient(90deg,var(--com),var(--com2))}
+.rk .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+/* table */
+.tools{padding:0 14px 8px}
+.tools .ctl{width:100%}.tools input{width:100%;max-width:none}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{position:sticky;top:0;background:var(--p);color:var(--mut);font-weight:500;text-align:left;padding:6px 6px;cursor:pointer;user-select:none;font-size:11px;z-index:1}
+thead th:hover{color:var(--tx)}
+td{padding:5px 6px;border-top:1px solid var(--bd)}
+tr:hover td{background:var(--p2)}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.z{color:var(--bad);opacity:.8}
+.tg{font-size:9.5px;padding:1px 6px;border-radius:99px;background:#ffb02022;color:var(--com);margin-left:4px;vertical-align:1px}
+.mut{color:var(--mut)}
+td .ig{color:var(--mut);font-size:11px;display:block;line-height:1.1}
+/* right col */
+.rt{display:grid;grid-template-rows:auto auto 1fr;gap:12px;min-height:0}
+.rt .panel{animation-delay:.2s}
+.donutwrap{display:flex;align-items:center;gap:14px;padding:0 14px 12px}
+.donutwrap svg{flex:none}
+.dl div{margin:3px 0;font-size:12px}.dl b{font-size:18px;display:block;font-variant-numeric:tabular-nums}
+.ring{transition:stroke-dasharray 1.2s cubic-bezier(.2,.8,.2,1)}
+.cols{display:flex;align-items:flex-end;gap:6px;height:74px;padding:0 14px 12px}
+.col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:14px;max-width:46px}
+.col .st{width:100%;display:flex;flex-direction:column-reverse;border-radius:5px;overflow:hidden;background:var(--p2);height:50px;justify-content:flex-start}
+.col .st i{display:block;width:100%;transition:height .9s cubic-bezier(.2,.8,.2,1);height:0}
+.col span{font-size:9.5px;color:var(--mut)}
+.tabs{display:flex;gap:4px;margin-left:auto}
+.tab{font-size:11px;padding:3px 9px;border-radius:99px;border:1px solid var(--bd);color:var(--mut);cursor:pointer;background:transparent}
+.tab.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chips span{background:var(--p2);border:1px solid var(--bd);border-radius:99px;padding:2px 9px;font-size:11.5px;animation:pop .4s both}
+.chips.bad span{border-color:#ff5d7340}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+@keyframes slide{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;opacity:1!important}}
+@media (max-width:1100px){
+  body{overflow:auto}.app{height:auto}.main,.lcol,.rcol{grid-template-columns:1fr;grid-template-rows:none}.panel{max-height:520px}.chartbox{height:260px;flex:none}.kpis{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <img class="logo" src="logo.png" alt="Commit Júnior">
+    <div><h1>Engajamento Commit</h1><div class="sub">#commeting × Instagram @commitjunior</div></div>
+    <div class="sp"></div>
+    <label class="ctl"><span>Mês</span><select id="mes"></select></label>
+    <label class="ctl"><span>Post</span><select id="post"></select></label>
+    <label class="ctl" title="Peso de cada curtida"><span>peso curtida</span><input id="wl" type="number" min="0" step="0.5" value="1"></label>
+    <label class="ctl" title="Peso de cada comentário"><span>peso coment.</span><input id="wc" type="number" min="0" step="0.5" value="3"></label>
+  </header>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="main">
+    <div class="lcol">
+      <div class="panel">
+        <div class="ph"><h2>Engajamento por post</h2>
+          <div class="leg" id="lgd"></div>
+          <label class="ctl" style="padding:2px 8px"><select id="base"><option value="m">Só membros</option><option value="t">Todos os perfis</option></select></label></div>
+        <div class="chartbox" id="chart"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="tabs" style="margin-left:0">
+          <button class="tab on" data-t="all">Membros</button><button class="tab" data-t="zero">Sem engajamento</button><button class="tab" data-t="orf">Fora do time</button></div>
+          <span class="mut" id="cnt" style="margin-left:auto"></span></div>
+        <div class="tools"><label class="ctl"><span>buscar</span><input id="q" placeholder="nome ou @…"></label></div>
+        <div class="scroll" id="sv"></div>
+      </div>
+    </div>
+
+    <div class="rcol">
+      <div class="panel">
+        <div class="ph"><h2>Participação</h2></div>
+        <div class="donutwrap" id="donut"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><h2>Ranking</h2><div class="leg"><span><i class="dot" style="background:var(--like)"></i>curtidas</span><span><i class="dot" style="background:var(--com)"></i>comentários</span></div></div>
+        <div class="podium" id="podium"></div>
+        <div class="scroll" id="rank"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="data.js"></script>
+<script>
+const {membros,posts}=window.DATA;
+const $=s=>document.querySelector(s), esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const meses=[...new Set(posts.map(p=>p.data.slice(0,7)))].sort().reverse();
+$('#mes').innerHTML='<option value="">Todos os meses</option>'+meses.map(m=>`<option value="${m}">${MES[+m.slice(5)-1]}/${m.slice(0,4)}</option>`).join('');
+let sortK='pts',sortDir=-1,tabSel='all';
+const h2m=new Map();membros.forEach((m,i)=>m.ig.forEach(h=>h2m.set(h.toLowerCase(),i)));
+const hue=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h};
+const ini=n=>n.replace(/\(.*?\)/g,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+const av=n=>`<div class="av" style="background:linear-gradient(135deg,hsl(${hue(n)} 70% 55%),hsl(${(hue(n)+40)%360} 70% 42%))">${esc(ini(n))}</div>`;
+const fd=d=>d.slice(8)+'/'+d.slice(5,7);
+
+function fillPosts(){
+  const m=$('#mes').value;
+  $('#post').innerHTML='<option value="">Todos os posts</option>'+posts.filter(p=>!m||p.data.startsWith(m)).map(p=>`<option value="${p.id}">${fd(p.data)} · ${esc(p.titulo)}</option>`).join('');
+}
+function count(el,to){
+  const t0=performance.now(),d=900;
+  const f=t=>{const k=Math.min(1,(t-t0)/d),e=1-Math.pow(1-k,3);el.textContent=Math.round(to*e);if(k<1)requestAnimationFrame(f)};
+  requestAnimationFrame(f);
+}
+function calc(){
+  const m=$('#mes').value,pid=$('#post').value;
+  const sel=posts.filter(p=>(!m||p.data.startsWith(m))&&(!pid||p.id===pid));
+  const wl=+$('#wl').value||0,wc=+$('#wc').value||0;
+  const rows=membros.map(x=>({nome:x.nome,ig:x.ig.join(', '),prov:x.provavel,l:0,c:0}));
+  const orf=new Map();let totL=0,totC=0;
+  sel.forEach(p=>{
+    p.curtidas.forEach(h=>{totL++;const i=h2m.get(h.toLowerCase());if(i!=null)rows[i].l++;else orf.set(h,p.nomes?.[h]||'')});
+    p.comentarios.forEach(h=>{totC++;const i=h2m.get(h.toLowerCase());if(i!=null)rows[i].c++;else orf.set(h,p.nomes?.[h]||'')});
+  });
+  rows.forEach(r=>r.pts=r.l*wl+r.c*wc);
+  return {rows,orf,sel,totL,totC,wl,wc};
+}
+const MET=[['eng','Membros engajados','var(--ok)','#2ee59d'],['pts','Pontos','var(--acc)','#a78bfa'],['l','Curtidas','var(--like)','#5b8cff'],['c','Comentários','var(--com)','#ffb020']];
+let metric='eng';
+function series(){
+  const m=$('#mes').value,base=$('#base').value,wl=+$('#wl').value||0,wc=+$('#wc').value||0;
+  const ps=posts.filter(p=>!m||p.data.startsWith(m)).sort((a,b)=>a.data.localeCompare(b.data)||a.id.localeCompare(b.id));
+  return ps.map(p=>{
+    const set=new Set();let l=0,c=0;
+    p.curtidas.forEach(h=>{const i=h2m.get(h.toLowerCase());if(i!=null){l++;set.add(i)}else if(base==='t')l++});
+    p.comentarios.forEach(h=>{const i=h2m.get(h.toLowerCase());if(i!=null){c++;set.add(i)}else if(base==='t')c++});
+    return {p,l,c,eng:set.size,pts:l*wl+c*wc,t:Date.parse(p.data+'T12:00:00')/864e5};
+  });
+}
+function renderChart(){
+  const box=$('#chart'),data=series(),[,mname,,hex]=MET.find(x=>x[0]===metric);
+  $('#lgd').innerHTML=MET.map(([k,n,c])=>`<span class="lg ${k===metric?'':'off'}" data-k="${k}" style="${k===metric?'':'text-decoration:none'}"><i class="dot" style="background:${c}"></i>${n}</span>`).join('');
+  document.querySelectorAll('.lg').forEach(e=>e.onclick=()=>{metric=e.dataset.k;renderChart()});
+  const viewW=box.clientWidth||600,H=box.clientHeight||260,L=36,R=26,T=34,B=28,n=data.length;
+  const W=Math.max(viewW,L+R+32+Math.max(0,n-1)*64);
+  const vals=data.map(d=>d[metric]);
+  const mx=Math.max(1,...vals);
+  const raw=mx/4,pw=Math.pow(10,Math.floor(Math.log10(raw))),step=[1,2,5,10].map(k=>k*pw).find(v=>v>=raw)||pw;
+  const top=Math.ceil(mx/step)*step||1;
+  const t0=n?data[0].t:0,t1=n?data[n-1].t:1,span=Math.max(1,t1-t0);
+  const X=i=>n<2?(L+(W-L-R)/2):L+16+(W-L-R-32)*i/(n-1),Y=v=>T+(H-T-B)*(1-v/top);
+  let g='';
+  for(let v=0;v<=top+1e-9;v+=step)g+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"/><text class="ax" x="${L-8}" y="${Y(v)+3.5}" text-anchor="end">${Math.round(v*10)/10}</text>`;
+  data.forEach((d,i)=>{g+=`<text class="ax" x="${X(i)}" y="${H-9}" text-anchor="middle">${fd(d.p.data)}</text>`});
+  let body='',trend='';
+  const P=data.map((d,i)=>[X(i),Y(d[metric])]);
+  if(n>1)body+=`<path d="${P.map((p,i)=>(i?'L':'M')+p[0]+','+p[1]).join(' ')}" fill="none" stroke="${hex}" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="4 5"/>`;
+  // tendência (mínimos quadrados), só com 3+ posts
+  let tx='';
+  if(n>=3){
+    const mt=data.reduce((a,d)=>a+d.t,0)/n,mv=vals.reduce((a,v)=>a+v,0)/n;
+    let num=0,den=0;data.forEach(d=>{num+=(d.t-mt)*(d[metric]-mv);den+=(d.t-mt)**2});
+    const sl=den?num/den:0,ic=mv-sl*mt,y0=Math.max(0,sl*t0+ic+0),y1=Math.max(0,sl*t1+ic);
+    const week=sl*7,up=week>0.05,dn=week<-0.05,col=up?'var(--ok)':dn?'var(--bad)':'var(--mut)';
+    tx=`<span style="color:${col};font-weight:700">${up?'▲':dn?'▼':'■'} ${week>0?'+':''}${(Math.round(week*10)/10).toString().replace('.',',')}</span> <span class="mut">${mname.toLowerCase()} por semana (tendência)</span>`;
+  }
+  data.forEach((d,i)=>{
+    const [x,y]=P[i];
+    body+=`<line x1="${x}" x2="${x}" y1="${y}" y2="${Y(0)}" stroke="${hex}" stroke-opacity=".18" stroke-width="2"/>
+    <circle class="cp" data-i="${i}" cx="${x}" cy="${y}" r="8" fill="${hex}" stroke="var(--p)" stroke-width="3" style="animation-delay:${.15+i*.07}s"/>
+    <text class="cp vl" x="${x}" y="${y-14}" text-anchor="middle" style="animation-delay:${.3+i*.07}s">${Math.round(d[metric]*10)/10}</text>`;
+  });
+  let hov='';
+  data.forEach((d,i)=>{
+    const left=i===0?L:(P[i-1][0]+P[i][0])/2;
+    const right=i===n-1?W-R:(P[i][0]+P[i+1][0])/2;
+    hov+=`<rect data-i="${i}" x="${left}" y="${T}" width="${right-left}" height="${H-T-B}" fill="transparent"/>`;
+  });
+  box.innerHTML=`<div class="chartscroll"><svg width="${W}" viewBox="0 0 ${W} ${H}">${g}${body}${hov}</svg></div><div class="tip" id="tip"></div>
+    ${tx?`<div class="trendtx">${tx}</div>`:''}${n<3?`<div class="hint">${n<2?'Só 1 post por enquanto.':'2 posts.'} A linha de tendência aparece a partir de 3 posts.</div>`:''}`;
+  const tip=$('#tip');
+  box.querySelectorAll('rect').forEach(r=>{
+    r.onmousemove=e=>{const d=data[+r.dataset.i],bx=box.getBoundingClientRect();
+      tip.innerHTML=`<b>${esc(d.p.titulo)}</b><span class="mut">${fd(d.p.data)}</span>`+MET.map(([k,nm,c])=>`<div><i class="dot" style="background:${c}"></i>${nm}: <b style="display:inline">${Math.round(d[k]*10)/10}</b></div>`).join('');
+      tip.style.opacity=1;tip.style.transform='none';
+      tip.style.left=Math.min(bx.width-tip.offsetWidth-6,Math.max(4,e.clientX-bx.left+12))+'px';tip.style.top=Math.max(4,e.clientY-bx.top-tip.offsetHeight-10)+'px'};
+    r.onmouseleave=()=>{tip.style.opacity=0};
+  });
+}
+function render(){
+  const {rows,orf,sel,totL,totC,wl,wc}=calc();
+  const eng=rows.filter(r=>r.l+r.c>0),zero=rows.filter(r=>r.l+r.c===0);
+  const pct=rows.length?Math.round(100*eng.length/rows.length):0;
+
+  const K=[[sel.length,'posts','var(--acc)'],[rows.length,'membros','var(--like)'],[eng.length,'engajaram','var(--ok)'],[zero.length,'sem engajamento','var(--bad)'],[totL,'curtidas (total)','var(--like)'],[totC,'comentários (total)','var(--com)']];
+  $('#kpis').innerHTML=K.map(([v,l,c],i)=>`<div class="kpi" style="--c:${c};animation-delay:${i*60}ms"><b data-v="${v}">0</b><small>${l}</small></div>`).join('');
+  document.querySelectorAll('.kpi b').forEach(b=>count(b,+b.dataset.v));
+
+  const sorted=[...eng].sort((a,b)=>b.pts-a.pts||a.nome.localeCompare(b.nome));
+  const max=Math.max(1,sorted[0]?.pts||1);
+  const med=['1º','2º','3º'];
+  $('#podium').innerHTML=sorted.slice(0,3).map((r,i)=>`<div class="pod"><div class="m">${med[i]}</div><div class="nm" title="${esc(r.nome)}">${esc(r.nome.split(' ').slice(0,2).join(' '))}</div><div class="pt">${r.l} curt. · ${r.c} coment. · ${r.pts} pts</div></div>`).join('');
+  $('#rank').innerHTML=sorted.map((r,i)=>`<div class="rk" style="animation-delay:${Math.min(i*22,700)}ms" title="${esc(r.nome)} · ${r.l} curtidas, ${r.c} comentários">
+    <div class="i">${i+1}</div>${av(r.nome)}
+    <div class="t"><div class="n">${esc(r.nome)}</div><div class="bar"><i data-w="${100*r.l*wl/max}"></i><i data-w="${100*r.c*wc/max}"></i></div></div>
+    <div class="v">${r.pts}</div></div>`).join('')||'<div class="mut">Sem dados.</div>';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%')));
+
+  const R=34,C=2*Math.PI*R;
+  $('#donut').innerHTML=`<svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="${R}" fill="none" stroke="var(--bad)" stroke-opacity=".28" stroke-width="12"/>
+    <circle class="ring" cx="48" cy="48" r="${R}" fill="none" stroke="var(--ok)" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 ${C}" data-d="${C*pct/100} ${C}" transform="rotate(-90 48 48)"/>
+    <text x="48" y="53" text-anchor="middle" font-size="18" font-weight="800" fill="currentColor">${pct}%</text></svg>
+    <div class="dl"><div><b style="color:var(--ok)">${eng.length}</b>engajaram</div><div><b style="color:var(--bad)">${zero.length}</b>não engajaram</div></div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{const r=document.querySelector('.ring');if(r)r.setAttribute('stroke-dasharray',r.dataset.d)}));
+
+  renderChart();renderView(rows,zero,orf);
+}
+function renderView(rows,zero,orf){
+  if(!rows){const c=calc();rows=c.rows;orf=c.orf;zero=rows.filter(r=>r.l+r.c===0)}
+  const q=$('#q').value.trim().toLowerCase(),sv=$('#sv');
+  if(tabSel==='orf'){
+    const it=[...orf].filter(([h,n])=>!q||(h+n).toLowerCase().includes(q)).sort();
+    $('#cnt').textContent=it.length+' perfis';
+    sv.innerHTML='<div class="chips">'+(it.map(([h,n],i)=>`<span style="animation-delay:${Math.min(i*12,400)}ms">@${esc(h)}${n?' · '+esc(n):''}</span>`).join('')||'<span>Nenhum</span>')+'</div>';return}
+  const base=tabSel==='zero'?zero:rows;
+  const tb=base.filter(r=>!q||r.nome.toLowerCase().includes(q)||r.ig.toLowerCase().includes(q))
+    .sort((a,b)=>{const x=a[sortK],y=b[sortK];return(typeof x==='string'?x.localeCompare(y):x-y)*sortDir||a.nome.localeCompare(b.nome)});
+  $('#cnt').textContent=tb.length+' de '+rows.length;
+  sv.innerHTML=`<table><thead><tr><th data-k="nome">Membro</th><th data-k="ig">@ Instagram</th><th data-k="l" class="n">Curt.</th><th data-k="c" class="n">Com.</th><th data-k="pts" class="n">Pts</th></tr></thead><tbody>`+
+   tb.map(r=>`<tr><td>${esc(r.nome)}${r.prov?'<span class="tg" title="correspondência provável">provável</span>':''}</td><td class="mut">${r.ig?'@'+esc(r.ig):'—'}</td>
+    <td class="n ${r.l?'':'z'}">${r.l}</td><td class="n ${r.c?'':'z'}">${r.c}</td><td class="n"><b>${r.pts}</b></td></tr>`).join('')+'</tbody></table>';
+  sv.querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;sortDir=sortK===k?-sortDir:(k==='nome'||k==='ig'?1:-1);sortK=k;renderView()});
+}
+$('#mes').onchange=()=>{fillPosts();render()};
+['#post','#wl','#wc'].forEach(s=>$(s).oninput=render);
+$('#base').onchange=renderChart;
+$('#q').oninput=()=>renderView();
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{tabSel=t.dataset.t;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));renderView()});
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(renderChart,120)});
+fillPosts();render();
+</script>
+</body>
+</html>
