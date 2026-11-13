@@ -2,6 +2,8 @@
 
 Dashboard que mostra quem do time (#commeting) curtiu e comentou nos posts do Instagram da @commitjunior.
 
+Acesse o site: [engajamento-commit.vercel.app](https://engajamento-commit.vercel.app).
+
 ## Como usar
 - `membros.json`: lista de membros do Slack e o @ de cada um no Instagram.
 - `posts/*.json`: um arquivo por post (`curtidas`, `comentarios`, `nomes`).
